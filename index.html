@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>cards</title>
+    <style>
+      :root {
+        --base-size: 5.5px;
+        --fall-duration: 600ms;
+        --flip-duration: 300ms;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        /* height: 100%; */
+        width: 100%;
+        box-sizing: border-box;
+        color: #555555;
+      }
+      header {
+        padding-top: calc(3 * var(--base-size));
+        font-size: calc(3 * var(--base-size));
+        width: 100%;
+        text-align: center;
+        font-family: serif;
+        font-style: italic;
+        font-weight: bold;
+      }
+      main {
+        width: 100%;
+        /* height: 100%; */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #fff;
+        margin: 0 0 calc(var(--base-size) * 2) 0;
+      }
+      main::after {
+        content: "";
+        position: absolute;
+        bottom: calc(var(--base-size) * -2);
+        left: 0;
+        width: 100%;
+        height: calc(var(--base-size) * 2);
+        background-image: linear-gradient(
+          to top,
+          rgba(255, 255, 255, 0),
+          #ffffff
+        );
+        pointer-events: none;
+      }
+      .card {
+        position: relative;
+        display: inline-block;
+        border-radius: var(--base-size);
+        width: calc(13 * var(--base-size));
+        height: calc(22.75 * var(--base-size));
+        margin: calc(4.875 * var(--base-size));
+        text-align: center;
+        font-size: calc(var(--base-size) * 10);
+        line-height: calc(22.75 * var(--base-size));
+        opacity: 0;
+        perspective: 1000px;
+        transform-style: preserve-3d;
+        animation: cardfall var(--fall-duration) ease-out both,
+          cardflip var(--flip-duration) ease-in-out forwards;
+        z-index: 1; /* Added z-index value */
+      }
+
+      .card > div {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--base-size);
+        width: 100%;
+        height: 100%;
+        box-shadow: calc(var(--base-size) * 1) calc(var(--base-size) * 1)
+            calc(var(--base-size) * 2) #c9c9c9,
+          calc(var(--base-size) * -1) calc(var(--base-size) * -1)
+            calc(var(--base-size) * 2) #ffffff;
+      }
+
+      .card div.front {
+        visibility: hidden;
+        outline: 1px solid #e2e2e2b7;
+        transform: rotateY(180deg);
+        width: 100%;
+        background-image: radial-gradient(
+          ellipse at center,
+          #ffffff 0%,
+          #00000008 100%
+        );
+        animation: showfront var(--flip-duration) step-end both;
+      }
+      .card div.back {
+        outline: calc(0.4 * var(--base-size)) ridge #ffffff40;
+        background-color: #fff;
+        background-image: linear-gradient(
+            45deg,
+            #00000040 25%,
+            transparent 25%,
+            transparent 75%,
+            #00000040 75%,
+            #00000040
+          ),
+          linear-gradient(
+            -45deg,
+            #00000040 25%,
+            transparent 25%,
+            transparent 75%,
+            #00000040 75%,
+            #00000040
+          );
+        background-size: calc(var(--base-size) * 3.25)
+          calc(var(--base-size) * 3.25);
+        background-repeat: repeat;
+        animation: hideback var(--flip-duration) step-end both;
+      }
+
+      .card:nth-child(1) {
+        animation-delay: 0s, calc(3 * var(--fall-duration));
+      }
+      .card:nth-child(2) {
+        animation-delay: var(--fall-duration),
+          calc(3 * var(--fall-duration) + var(--flip-duration));
+      }
+      .card:nth-child(3) {
+        animation-delay: calc(2 * var(--fall-duration)),
+          calc(3 * var(--fall-duration) + 2 * var(--flip-duration));
+      }
+      div.card:nth-child(1) > div {
+        animation-delay: calc(3 * var(--fall-duration));
+      }
+      div.card:nth-child(2) > div {
+        animation-delay: calc(3 * var(--fall-duration) + var(--flip-duration));
+      }
+      div.card:nth-child(3) > div {
+        animation-delay: calc(
+          3 * var(--fall-duration) + 2 * var(--flip-duration)
+        );
+      }
+      @keyframes cardfall {
+        0% {
+          transform: scale(10) rotate(15deg);
+        }
+        20% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateZ(0);
+          opacity: 1;
+        }
+      }
+      @keyframes cardflip {
+        0% {
+          transform: rotateY(0deg);
+        }
+        100% {
+          transform: rotateY(-180deg);
+        }
+      }
+      @keyframes hideback {
+        50% {
+          visibility: hidden;
+        }
+        100% {
+          visibility: hidden;
+        }
+      }
+
+      @keyframes showfront {
+        50% {
+          visibility: visible;
+        }
+        100% {
+          visibility: visible;
+        }
+      }
+      section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: calc(var(--base-size) * 2);
+        justify-content: center;
+      }
+      section .interpretation {
+        font-size: calc(var(--base-size) * 3);
+        width: calc(70 * var(--base-size));
+        margin: calc(2 * var(--base-size)) 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      section .interpretation span {
+        opacity: 0;
+      }
+      .showing {
+        animation: showtext 0.01s step-end both;
+      }
+      @keyframes showtext {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      button {
+        margin: 0 auto;
+        font-size: calc(2 * var(--base-size));
+      }
+      @media screen and (min-width: 500px) {
+        :root {
+          --base-size: 7px;
+        }
+      }
+      @media screen and (min-width: 700px) {
+        :root {
+          --base-size: 10px;
+        }
+      }
+      @media screen and (min-width: 800px) {
+        :root {
+          --base-size: 11.45px;
+        }
+      }
+      @media screen and (min-width: 900px) {
+        :root {
+          --base-size: 12.87px;
+        }
+      }
+      @media screen and (min-width: 1020px) {
+        :root {
+          --base-size: 14.6px;
+        }
+        section .interpretation {
+          font-size: calc(var(--base-size) * 2);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>~ emoji tarot ~</header>
+    <main>
+      <div class="card">
+        <div class="front">😎</div>
+        <div class="back"></div>
+      </div>
+      <div class="card">
+        <div class="front">😡</div>
+        <div class="back"></div>
+      </div>
+      <div class="card">
+        <div class="front">🥶</div>
+        <div class="back"></div>
+      </div>
+    </main>
+
+    <section>
+      <button id="interpret_button_1" style="display: none">
+        Interpret the first card
+      </button>
+      <div class="interpretation"></div>
+      <button id="interpret_button_2" style="display: none">
+        Interpret the second card
+      </button>
+      <div class="interpretation"></div>
+      <button id="interpret_button_3" style="display: none">
+        Interpret the third card
+      </button>
+      <div class="interpretation"></div>
+    </section>
+
+    <script>
+      //wait for document to load
+      document.addEventListener("DOMContentLoaded", () => {
+        // get the div.front elements
+        const card_fronts = document.querySelectorAll(".card div.front");
+        const interpretations = document.querySelectorAll(".interpretation");
+        const interpret_button_1 =
+          document.getElementById("interpret_button_1");
+        const interpret_button_2 =
+          document.getElementById("interpret_button_2");
+        const interpret_button_3 =
+          document.getElementById("interpret_button_3");
+
+        fetch("emojis.json")
+          .then((response) => response.json())
+          .then((emoji_list) => {
+            const length = emoji_list.length;
+            const random_numbers = new Uint32Array(length);
+            window.crypto.getRandomValues(random_numbers);
+            const picked_numbers = random_numbers.slice(0, 3);
+            let picks = [];
+            for (const num of picked_numbers) {
+              picks.push(num % length);
+            }
+            card_fronts.forEach((card_front, index) => {
+              console.log(card_front, index);
+              card_front.textContent = emoji_list[picks[index]];
+              fetch(`api/${emoji_list[picks[index]]}.json`)
+                .then((response) => response.json())
+                .then((emoji_data) => {
+                  console.log(emoji_data);
+                  const order =
+                    index === 0
+                      ? "First card:"
+                      : index === 1
+                      ? "Second card:"
+                      : "Third card:";
+
+                  let inner_text = `${order} ${
+                    emoji_data.emoji
+                  } ${emoji_data.short_name.toUpperCase()} <br><br> ${
+                    emoji_data.interpretation
+                  } <br><br>Keywords: ${emoji_data.keywords.join(", ")}`;
+
+                  const book_text = inner_text.split(" ");
+                  const wrapped_book_text = book_text.map(
+                    (word) => `<span>${word}</span>`
+                  );
+                  interpretations[index].innerHTML =
+                    wrapped_book_text.join(" ");
+                });
+            });
+            // Show the interpretation button after the last animation completes
+          });
+        // Select all elements with the animation class
+        const cards = document.querySelectorAll(".card");
+
+        // Initialize a counter for ongoing animations
+        let ongoingAnimations = cards.length;
+
+        // Add event listeners to all elements
+        Array.from(cards).forEach((card) => {
+          card.addEventListener("animationend", animationCompleteHandler);
+        });
+
+        // Define the animation complete event handler function
+        function animationCompleteHandler(event) {
+          if (event.animationName === "cardflip") {
+            // Decrement the ongoingAnimations counter
+            ongoingAnimations--;
+
+            // Check if it's the last animation to complete
+            if (ongoingAnimations === 0) {
+              // Last animation with the specified animationName has completed
+              // Write your code here to handle the last animation completion
+              console.log("last animation");
+              interpret_button_1.style.display = "block";
+            }
+          }
+        }
+
+        interpret_button_1.addEventListener("click", () => {
+          interpret_button_1.style.display = "none";
+          fortune_typer(interpretations[0]);
+        });
+
+        interpret_button_2.addEventListener("click", () => {
+          interpret_button_2.style.display = "none";
+          fortune_typer(interpretations[1]);
+        });
+
+        interpret_button_3.addEventListener("click", () => {
+          interpret_button_3.style.display = "none";
+          fortune_typer(interpretations[2]);
+        });
+
+        function fortune_typer(interpretation) {
+          const spans = interpretation.querySelectorAll("span");
+          interpretation.style.maxHeight = interpretation.scrollHeight + "px";
+          //scroll it into view
+
+          let index = 0;
+
+          const fadeInSpan = () => {
+            if (index >= spans.length) {
+              // Reached the end of spans, move on to the next interpretation
+              const nextButton = interpretation.nextElementSibling;
+              if (nextButton) {
+                nextButton.style.display = "block";
+                nextButton.scrollIntoView();
+              }
+              return;
+            }
+
+            const span = spans[index];
+            span.classList.add("showing");
+            span.scrollIntoView();
+            span.addEventListener(
+              "animationend",
+              () => {
+                index++;
+                requestAnimationFrame(() => {
+                  fadeInSpan();
+                });
+              },
+              { once: true }
+            );
+          };
+
+          fadeInSpan();
+        }
+      });
+    </script>
+  </body>
+</html>
