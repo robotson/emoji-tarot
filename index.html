@@ -303,7 +303,8 @@
             card_fronts.forEach((card_front, index) => {
               console.log(card_front, index);
               card_front.textContent = emoji_list[picks[index]];
-              fetch(`api/${emoji_list[picks[index]]}.json`)
+              // make sure to use url encoding for emoji with encodeURIComponent()
+              fetch(`api/${encodeURIComponent(emoji_list[picks[index]])}.json`)
                 .then((response) => response.json())
                 .then((emoji_data) => {
                   console.log(emoji_data);
