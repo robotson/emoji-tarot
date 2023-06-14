@@ -6,19 +6,22 @@
     <title>cards</title>
     <style>
       :root {
-        --base-size: 5.5px;
+        --base-size: min(14.6px, min(1.3vw, 1.3vh));
+        --text-size: min(9px, 1.4vmin);
         --fall-duration: 600ms;
         --flip-duration: 300ms;
       }
-
-      html,
       body {
-        margin: 0;
-        padding: 0;
-        /* height: 100%; */
-        width: 100%;
+        margin: 0 auto;
+        width: calc(66 * var(--base-size));
         box-sizing: border-box;
         color: #555555;
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--base-size) * 1.5);
+        /* we want padding on the left and right */
+        padding: calc(var(--base-size) * 3);
+        scroll-padding: calc(var(--base-size) * 23) 0 0 0;
       }
       header {
         padding-top: calc(3 * var(--base-size));
@@ -28,10 +31,10 @@
         font-family: serif;
         font-style: italic;
         font-weight: bold;
+        margin-bottom: calc(4.875 * var(--base-size));
       }
       main {
         width: 100%;
-        /* height: 100%; */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -40,20 +43,28 @@
         z-index: 2;
         background-color: #fff;
         margin: 0 0 calc(var(--base-size) * 2) 0;
+        height: calc(var(--base-size) * 24);
       }
       main::after {
         content: "";
         position: absolute;
-        bottom: calc(var(--base-size) * -2);
+        bottom: calc(var(--base-size) * -4);
         left: 0;
         width: 100%;
-        height: calc(var(--base-size) * 2);
+        height: calc(var(--base-size) * 4);
         background-image: linear-gradient(
           to top,
           rgba(255, 255, 255, 0),
+          #ffffff,
           #ffffff
         );
         pointer-events: none;
+      }
+      .card:nth-child(2) {
+        --card-padding: calc(var(--base-size) * 10);
+
+        margin-left: var(--card-padding);
+        margin-right: var(--card-padding);
       }
       .card {
         position: relative;
@@ -61,7 +72,7 @@
         border-radius: var(--base-size);
         width: calc(13 * var(--base-size));
         height: calc(22.75 * var(--base-size));
-        margin: calc(4.875 * var(--base-size));
+        /* margin: calc(4.875 * var(--base-size)); */
         text-align: center;
         font-size: calc(var(--base-size) * 10);
         line-height: calc(22.75 * var(--base-size));
@@ -182,26 +193,27 @@
         }
       }
       section {
+        padding-top: calc(2 * var(--base-size));
         display: flex;
+        gap: calc(4 * var(--base-size));
         flex-direction: column;
-        align-items: center;
-        padding: calc(var(--base-size) * 2);
-        justify-content: center;
       }
       section .interpretation {
-        font-size: calc(var(--base-size) * 3);
-        width: calc(70 * var(--base-size));
-        margin: calc(2 * var(--base-size)) 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
+        font-size: calc(var(--text-size) * 3);
+        /* margin: calc(2 * var(--text-size)) 0; */
       }
       section .interpretation span {
         opacity: 0;
+        display: none;
+        /* scroll-margin-top: calc(24 * var(--base-size)); */
       }
       .showing {
-        animation: showtext 0.01s step-end both;
+        animation: showtext 16ms step-end both;
       }
+      .collapse {
+        display: none;
+      }
+
       @keyframes showtext {
         0% {
           opacity: 0;
@@ -211,83 +223,80 @@
         }
       }
       button {
-        margin: 0 auto;
-        font-size: calc(2 * var(--base-size));
+        font-size: calc(2 * var(--text-size));
+        height: calc(5 * var(--base-size));
+        border-radius: var(--base-size);
+
+        box-shadow: inset 0px 1px 0px 0px #ffffff;
+        background: linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
+        background-color: #ffffff;
+        text-decoration: none;
+        text-shadow: 0px 1px 0px #ffffff;
+        border: 1px solid #dcdcdc;
+        color: #666666;
+        font-weight: bold;
+        cursor: pointer;
       }
-      @media screen and (min-width: 500px) {
-        :root {
-          --base-size: 7px;
-        }
+
+      button:hover {
+        background: linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
+        background-color: #f6f6f6;
       }
-      @media screen and (min-width: 700px) {
-        :root {
-          --base-size: 10px;
-        }
-      }
-      @media screen and (min-width: 800px) {
-        :root {
-          --base-size: 11.45px;
-        }
-      }
-      @media screen and (min-width: 900px) {
-        :root {
-          --base-size: 12.87px;
-        }
-      }
-      @media screen and (min-width: 1020px) {
-        :root {
-          --base-size: 14.6px;
-        }
-        section .interpretation {
-          font-size: calc(var(--base-size) * 2);
-        }
+      button:active {
+        position: relative;
+        top: 1px;
       }
     </style>
   </head>
   <body>
-    <header>~ emoji tarot ~</header>
+    <header>~ emoji-tarot ~</header>
     <main>
       <div class="card">
-        <div class="front">😎</div>
+        <div class="front"></div>
         <div class="back"></div>
       </div>
       <div class="card">
-        <div class="front">😡</div>
+        <div class="front"></div>
         <div class="back"></div>
       </div>
       <div class="card">
-        <div class="front">🥶</div>
+        <div class="front"></div>
         <div class="back"></div>
       </div>
     </main>
 
-    <section>
+    <section class="collapse">
       <button id="interpret_button_1" style="display: none">
         Interpret the first card
       </button>
-      <div class="interpretation"></div>
+      <div class="interpretation collapse"></div>
+
       <button id="interpret_button_2" style="display: none">
         Interpret the second card
       </button>
-      <div class="interpretation"></div>
+      <div class="interpretation collapse"></div>
       <button id="interpret_button_3" style="display: none">
         Interpret the third card
       </button>
-      <div class="interpretation"></div>
+      <div class="interpretation collapse"></div>
     </section>
 
     <script>
-      //wait for document to load
       document.addEventListener("DOMContentLoaded", () => {
-        // get the div.front elements
         const card_fronts = document.querySelectorAll(".card div.front");
         const interpretations = document.querySelectorAll(".interpretation");
+        const body = document.querySelector("body");
+        const main = document.querySelector("main");
+        const section = document.querySelector("section");
+        const header = document.querySelector("header");
         const interpret_button_1 =
           document.getElementById("interpret_button_1");
         const interpret_button_2 =
           document.getElementById("interpret_button_2");
         const interpret_button_3 =
           document.getElementById("interpret_button_3");
+
+        header.scrollIntoView({ behavior: "smooth" });
 
         fetch("emojis.json")
           .then((response) => response.json())
@@ -317,42 +326,32 @@
 
                   let inner_text = `${order} ${
                     emoji_data.emoji
-                  } ${emoji_data.short_name.toUpperCase()} <br><br> ${
-                    emoji_data.interpretation
-                  } <br><br>Keywords: ${emoji_data.keywords.join(", ")}`;
+                  } ${emoji_data.short_name.toUpperCase()} <br> <br> ${emoji_data.interpretation.replace(
+                    /\n/g,
+                    "<br>"
+                  )} <br> <br> Keywords: ${emoji_data.keywords.join(", ")}`;
 
                   const book_text = inner_text.split(" ");
-                  const wrapped_book_text = book_text.map(
-                    (word) => `<span>${word}</span>`
+                  console.log(book_text);
+                  const wrapped_book_text = book_text.map((word) =>
+                    word === "<br>" ? "<br>" : `<span>${word}</span>`
                   );
                   interpretations[index].innerHTML =
                     wrapped_book_text.join(" ");
                 });
             });
-            // Show the interpretation button after the last animation completes
           });
-        // Select all elements with the animation class
+
         const cards = document.querySelectorAll(".card");
-
-        // Initialize a counter for ongoing animations
         let ongoingAnimations = cards.length;
-
-        // Add event listeners to all elements
         Array.from(cards).forEach((card) => {
           card.addEventListener("animationend", animationCompleteHandler);
         });
-
-        // Define the animation complete event handler function
         function animationCompleteHandler(event) {
           if (event.animationName === "cardflip") {
-            // Decrement the ongoingAnimations counter
             ongoingAnimations--;
-
-            // Check if it's the last animation to complete
             if (ongoingAnimations === 0) {
-              // Last animation with the specified animationName has completed
-              // Write your code here to handle the last animation completion
-              console.log("last animation");
+              section.classList.remove("collapse");
               interpret_button_1.style.display = "block";
             }
           }
@@ -373,34 +372,77 @@
           fortune_typer(interpretations[2]);
         });
 
+        function isVisible(element) {
+          const rect = element.getBoundingClientRect();
+          return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <=
+              (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <=
+              (window.innerWidth || document.documentElement.clientWidth)
+          );
+        }
+
         function fortune_typer(interpretation) {
+          interpretation.classList.remove("collapse");
+          const body = document.body;
+          const main = document.querySelector("main");
+          const header = document.querySelector("header");
+
+          body.style.minHeight = `calc(${interpretation.offsetTop}px + (100vh - (var(--base-size) * 23)))`;
+
+          const scrollTop =
+            interpretation.offsetTop - main.offsetHeight - header.offsetHeight;
+
+          window.scrollTo({
+            top: scrollTop,
+            behavior: "smooth",
+          });
+
           const spans = interpretation.querySelectorAll("span");
-          interpretation.style.maxHeight = interpretation.scrollHeight + "px";
-          //scroll it into view
 
           let index = 0;
 
           const fadeInSpan = () => {
             if (index >= spans.length) {
-              // Reached the end of spans, move on to the next interpretation
+              // insert a dinkus div after interpretation
+
+              const dinkus = document.createElement("div");
+              dinkus.style.textAlign = "center";
+              dinkus.innerHTML = "* * *";
+              dinkus.style.margin = "calc(var(--base-size) * 2) 0 0 0";
+              interpretation.appendChild(dinkus);
               const nextButton = interpretation.nextElementSibling;
+
               if (nextButton) {
                 nextButton.style.display = "block";
-                nextButton.scrollIntoView();
+                if (!isVisible(nextButton)) {
+                  nextButton.scrollIntoView({ behavior: "smooth" });
+                }
               }
               return;
             }
 
             const span = spans[index];
+            span.style.display = "inline";
             span.classList.add("showing");
-            span.scrollIntoView();
+
+            const durations = [5, 6, 10, 17, 16, 22, 33, 100];
+            const span_duration =
+              durations[Math.floor(Math.random() * durations.length)];
+            span.style.animationDelay = span_duration + "ms";
+
+            if (!isVisible(span)) {
+              span.scrollIntoView({ behavior: "smooth" });
+            }
             span.addEventListener(
               "animationend",
               () => {
                 index++;
-                requestAnimationFrame(() => {
-                  fadeInSpan();
-                });
+                // requestAnimationFrame(() => {
+                fadeInSpan();
+                // });
               },
               { once: true }
             );
