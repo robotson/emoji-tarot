@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Testing Mock API responses</title>
+  </head>
+  <body>
+    <script>
+      document.addEventListener("DOMContentLoaded", main);
+      async function main() {
+        console.log("hello");
+        const body = document.querySelector("body");
+        // get all the emoji from the local json file
+        const response = await fetch("emojis.json");
+
+        const emojis = await response.json();
+
+        // test the mock API with every emoji
+        // we want to make sure we don't get 404s
+        let i = 1;
+
+        for (const emoji of emojis) {
+          // do this on a delay so it doesn't get rate limited
+          i++;
+          setTimeout(() => {
+            fetch(`api/${emoji}.json`)
+              .then((response) => {
+                if (response.status === 404) {
+                  const p = document.createElement("p");
+                  p.textContent = emoji;
+                  body.appendChild(p);
+                } else {
+                  console.log(response.status);
+                }
+              })
+              .catch(console.error);
+          }, i * (31.25 * 2));
+        }
+      }
+    </script>
+  </body>
+</html>
