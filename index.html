@@ -5,6 +5,14 @@
 
     <title>emoji-tarot</title>
     <style>
+      * {
+        outline: 0.4px dotted red;
+      }
+      @font-face {
+        font-family: "color-emoji";
+        src: local("Apple Color Emoji"), local("Segoe UI Emoji"),
+          local("Segoe UI Symbol"), local("Noto Color Emoji");
+      }
       :root {
         --base-size: min(14.6px, min(1.3vw, 1.3vh));
         --text-size: min(9px, 1.4vmin);
@@ -100,6 +108,7 @@
         visibility: hidden;
         outline: 1px solid #e2e2e2b7;
         transform: rotateY(180deg);
+        font-family: system-ui, color-emoji;
         width: 100%;
         background-image: radial-gradient(
           ellipse at center,
@@ -296,7 +305,7 @@
         const interpret_button_3 =
           document.getElementById("interpret_button_3");
 
-        header.scrollIntoView({ behavior: "smooth" });
+        header.scrollIntoView({ behavior: "smooth", block: "end" });
 
         fetch("emojis.json")
           .then((response) => response.json())
@@ -316,7 +325,6 @@
               fetch(`api/${encodeURIComponent(emoji_list[picks[index]])}.json`)
                 .then((response) => response.json())
                 .then((emoji_data) => {
-                  console.log(emoji_data);
                   const order =
                     index === 0
                       ? "First card:"
@@ -332,7 +340,6 @@
                   )} <br> <br> Keywords: ${emoji_data.keywords.join(", ")}`;
 
                   const book_text = inner_text.split(" ");
-                  console.log(book_text);
                   const wrapped_book_text = book_text.map((word) =>
                     word === "<br>" ? "<br>" : `<span>${word}</span>`
                   );
