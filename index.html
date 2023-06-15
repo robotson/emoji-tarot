@@ -9,6 +9,7 @@
         font-family: "color-emoji";
         src: local("Apple Color Emoji"), local("Segoe UI Emoji"),
           local("Segoe UI Symbol"), local("Noto Color Emoji");
+        /* https://github.com/twbs/bootstrap/issues/26227 */
       }
       :root {
         --base-size: min(14.6px, min(1.3vw, 1.3vh));
@@ -105,7 +106,7 @@
         visibility: hidden;
         outline: 1px solid #e2e2e2b7;
         transform: rotateY(180deg);
-        font-family: system-ui, color-emoji;
+        font-family: color-emoji, serif;
         width: 100%;
         background-image: radial-gradient(
           ellipse at center,
