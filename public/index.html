@@ -503,7 +503,7 @@
                 interpretation.after(end_button_row);
                 //there is no more buttons so lets give them a "copy share link" button
                 const copyButton = document.createElement("button");
-                copyButton.textContent = "Clipboard copy share link";
+                copyButton.textContent = "Copy share link";
                 end_button_row.appendChild(copyButton);
                 // lets make that button actually clickable
                 copyButton.addEventListener("click", () => {
@@ -516,6 +516,10 @@
                   new_url.pathname = emoji_in_cards.join("/");
 
                   navigator.clipboard.writeText(new_url.href);
+                  copyButton.textContent = "Copied!";
+                  setTimeout(() => {
+                    copyButton.textContent = "Copy share link";
+                  }, 2000);
                 });
 
                 // lets also make a new button that says "Start a new reading" but all it does is refresh the page lol
