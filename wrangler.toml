@@ -1,5 +1,0 @@
-[site]
-bucket = "./public"
-
-[build]
-command = ""
