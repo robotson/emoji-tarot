@@ -251,6 +251,17 @@
         position: relative;
         top: 1px;
       }
+      .game_over {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: calc(var(--base-size) * 1.5);
+      }
+      .game_over button {
+        flex-grow: 1;
+        flex-basis: 0;
+      }
     </style>
   </head>
   <body>
@@ -287,6 +298,28 @@
     </section>
 
     <script>
+      const replaceKeycapNumberSignEmojiInURL = () => {
+        const currentURL = window.location.href;
+        const updatedURL = currentURL.replace(
+          /(#%EF%B8%8F%E2%83%A3|[#️⃣])/g,
+          "%23%EF%B8%8F%E2%83%A3"
+        );
+
+        window.history.replaceState(null, null, updatedURL);
+      };
+
+      replaceKeycapNumberSignEmojiInURL();
+      const origin = window.location.origin;
+      const url = new URL(window.location.href);
+      const root_only =
+        window.location.pathname === "/" || window.location.pathname === "";
+      const has_three_path_segments = url.pathname.split("/").length === 4;
+
+      if (!root_only && !has_three_path_segments) {
+        console.log("failed before 3 path segments");
+        window.history.pushState(null, null, origin);
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         const card_fronts = document.querySelectorAll(".card div.front");
         const interpretations = document.querySelectorAll(".interpretation");
@@ -303,22 +336,60 @@
 
         header.scrollIntoView({ behavior: "smooth", block: "end" });
 
-        fetch("emojis.json")
+        fetch(`${origin}/emojis.json`)
           .then((response) => response.json())
           .then((emoji_list) => {
-            const length = emoji_list.length;
-            const random_numbers = new Uint32Array(length);
-            window.crypto.getRandomValues(random_numbers);
-            const picked_numbers = random_numbers.slice(0, 3);
-            let picks = [];
-            for (const num of picked_numbers) {
-              picks.push(num % length);
+            // keep an array for the emoji's that we'll pick randomly or get from the url
+            const picks = [];
+            // now that we have the emoji we can check and see if the url contains a valid set of paths
+            if (!root_only && has_three_path_segments) {
+              const segments = decodeURI(url.pathname).substring(1).split("/");
+              // set a flag if each segment is unique
+              const unique_paths = segments.every((segment) => {
+                return (
+                  segments.indexOf(segment) === segments.lastIndexOf(segment)
+                );
+              });
+              // set a flag that is true if each segment is in the emoji list
+              const valid_paths = segments.every((segment) => {
+                return emoji_list.includes(segment);
+              });
+
+              if (!unique_paths || !valid_paths) {
+                window.history.pushState(null, null, origin);
+              } else {
+                // we have a valid set of paths and should put them in the picks
+                for (const segment of segments) {
+                  picks.push(emoji_list.indexOf(segment));
+                }
+              }
+            } else {
+              // we don't have a valid set of paths so we'll get random numbers to pick from
+              const length = emoji_list.length;
+              const random_numbers = new Uint32Array(length);
+              window.crypto.getRandomValues(random_numbers);
+              const picked_numbers = random_numbers.slice(0, 3);
+              for (const num of picked_numbers) {
+                picks.push(num % length);
+              }
+              // update the url with the picks as an index into the emoji list
+              // create the new url
+              // const new_url = new URL(origin);
+              // new_url.pathname = picks
+              //   .map((index) => emoji_list[index])
+              //   .join("/");
+              // window.history.pushState(null, null, new_url);
             }
+
             card_fronts.forEach((card_front, index) => {
               console.log(card_front, index);
               card_front.textContent = emoji_list[picks[index]];
               // make sure to use url encoding for emoji with encodeURIComponent()
-              fetch(`api/${encodeURIComponent(emoji_list[picks[index]])}.json`)
+              fetch(
+                `${origin}/api/${encodeURIComponent(
+                  emoji_list[picks[index]]
+                )}.json`
+              )
                 .then((response) => response.json())
                 .then((emoji_data) => {
                   const order =
@@ -423,6 +494,40 @@
                 if (!isVisible(nextButton)) {
                   nextButton.scrollIntoView({ behavior: "smooth" });
                 }
+              } else {
+                // before doing anything else lets set up a container to add after
+                // this final interpretation that we can put some buttons into
+                const end_button_row = document.createElement("div");
+                end_button_row.classList.add("game_over");
+                // make it the next element to come after the interpretation
+                interpretation.after(end_button_row);
+                //there is no more buttons so lets give them a "copy share link" button
+                const copyButton = document.createElement("button");
+                copyButton.textContent = "Clipboard copy share link";
+                end_button_row.appendChild(copyButton);
+                // lets make that button actually clickable
+                copyButton.addEventListener("click", () => {
+                  // we need to build a url out of the paths and the emoji in the cards
+                  // and then copy it
+                  const new_url = new URL(origin);
+                  const emoji_in_cards = Array.from(
+                    document.querySelectorAll(".card .front")
+                  ).map((card) => card.textContent);
+                  new_url.pathname = emoji_in_cards.join("/");
+
+                  navigator.clipboard.writeText(new_url.href);
+                });
+
+                // lets also make a new button that says "Start a new reading" but all it does is refresh the page lol
+                const newButton = document.createElement("button");
+                newButton.textContent = "Start a new reading";
+                end_button_row.appendChild(newButton);
+                // lets make it work
+                newButton.addEventListener("click", () => {
+                  // we need to navigate back to the origin and trigger a reload
+                  header.scrollIntoView({ behavior: "smooth", block: "end" });
+                  window.location.href = origin;
+                });
               }
               return;
             }
