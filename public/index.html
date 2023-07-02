@@ -298,25 +298,17 @@
     </section>
 
     <script>
-      const replaceKeycapNumberSignEmojiInURL = () => {
-        const currentURL = window.location.href;
-        const updatedURL = currentURL.replace(
-          /(#%EF%B8%8F%E2%83%A3|[#️⃣])/g,
-          "%23%EF%B8%8F%E2%83%A3"
-        );
-
-        window.history.replaceState(null, null, updatedURL);
-      };
-
-      replaceKeycapNumberSignEmojiInURL();
       const origin = window.location.origin;
       const url = new URL(window.location.href);
       const root_only =
         window.location.pathname === "/" || window.location.pathname === "";
-      const has_three_path_segments = url.pathname.split("/").length === 4;
 
-      if (!root_only && !has_three_path_segments) {
-        console.log("failed before 3 path segments");
+      // we want to test if there are four path segments and the first one is "cards"
+      const path_fragments = url.pathname.split("/");
+      const valid_api_format =
+        path_fragments[1] === "cards" && path_fragments.length === 5;
+      // if it's not the first path segment or it's not a valid api format then url to root
+      if (!root_only && !valid_api_format) {
         window.history.pushState(null, null, origin);
       }
 
@@ -336,14 +328,18 @@
 
         header.scrollIntoView({ behavior: "smooth", block: "end" });
 
-        fetch(`${origin}/emojis.json`)
+        fetch(`${origin}/map-emoji.json`)
           .then((response) => response.json())
-          .then((emoji_list) => {
+          .then((emoji_list_data) => {
+            const emoji_map = new Map(emoji_list_data);
+            const emoji_list = emoji_list_data.map((sub_arr) => sub_arr[0]);
+            console.log(emoji_list);
             // keep an array for the emoji's that we'll pick randomly or get from the url
             const picks = [];
-            // now that we have the emoji we can check and see if the url contains a valid set of paths
-            if (!root_only && has_three_path_segments) {
-              const segments = decodeURI(url.pathname).substring(1).split("/");
+            // now that we have the emoji data we can check and see if the url contains a valid set of paths
+            if (!root_only && valid_api_format) {
+              // lets get the path segments following /cards/
+              const segments = path_fragments.slice(-3);
               // set a flag if each segment is unique
               const unique_paths = segments.every((segment) => {
                 return (
@@ -352,7 +348,7 @@
               });
               // set a flag that is true if each segment is in the emoji list
               const valid_paths = segments.every((segment) => {
-                return emoji_list.includes(segment);
+                return emoji_map.has(segment);
               });
 
               if (!unique_paths || !valid_paths) {
@@ -364,7 +360,8 @@
                 }
               }
             } else {
-              // we don't have a valid set of paths so we'll get random numbers to pick from
+              // we're at the origin url, or we don't have a valid set of paths
+              // so we'll get random numbers to pick from
               const length = emoji_list.length;
               const random_numbers = new Uint32Array(length);
               window.crypto.getRandomValues(random_numbers);
@@ -372,24 +369,13 @@
               for (const num of picked_numbers) {
                 picks.push(num % length);
               }
-              // update the url with the picks as an index into the emoji list
-              // create the new url
-              // const new_url = new URL(origin);
-              // new_url.pathname = picks
-              //   .map((index) => emoji_list[index])
-              //   .join("/");
-              // window.history.pushState(null, null, new_url);
+              // we might want to update the URL for a share link here someday
             }
 
             card_fronts.forEach((card_front, index) => {
               console.log(card_front, index);
-              card_front.textContent = emoji_list[picks[index]];
-              // make sure to use url encoding for emoji with encodeURIComponent()
-              fetch(
-                `${origin}/api/${encodeURIComponent(
-                  emoji_list[picks[index]]
-                )}.json`
-              )
+              card_front.textContent = emoji_map.get(emoji_list[picks[index]]);
+              fetch(`${origin}/api/${emoji_list[picks[index]]}.json`)
                 .then((response) => response.json())
                 .then((emoji_data) => {
                   const order =
@@ -412,6 +398,12 @@
                   );
                   interpretations[index].innerHTML =
                     wrapped_book_text.join(" ");
+
+                  // we also need to store the url_fragment as a data attribute
+                  card_front.setAttribute(
+                    "data-url_fragment",
+                    emoji_list[picks[index]]
+                  );
                 });
             });
           });
@@ -507,13 +499,13 @@
                 end_button_row.appendChild(copyButton);
                 // lets make that button actually clickable
                 copyButton.addEventListener("click", () => {
-                  // we need to build a url out of the paths and the emoji in the cards
+                  // we need to build a url out of the paths in the cards
                   // and then copy it
                   const new_url = new URL(origin);
-                  const emoji_in_cards = Array.from(
+                  const urls_in_cards = Array.from(
                     document.querySelectorAll(".card .front")
-                  ).map((card) => card.textContent);
-                  new_url.pathname = emoji_in_cards.join("/");
+                  ).map((card) => card.dataset.url_fragment);
+                  new_url.pathname = "cards/" + urls_in_cards.join("/");
 
                   navigator.clipboard.writeText(new_url.href);
                   copyButton.textContent = "Copied!";
