@@ -1617,9 +1617,17 @@ export async function onRequestGet(context) {
       const emoji_values = url_emojis.map((x) => emoji_map.get(x));
       const rewriter = new HTMLRewriter()
         .on('meta[property="og:image"]', new OGImageRewriter(url_emojis))
+        .on('meta[name="twitter:image"]', new OGImageRewriter(url_emojis))
+
         .on('meta[property="og:url"]', new OGUrlRewriter(url_emojis))
+        .on('meta[property="twitter:url"]', new OGUrlRewriter(url_emojis))
+
         .on(
           'meta[property="og:description"]',
+          new OGDescriptionRewriter(emoji_values)
+        )
+        .on(
+          'meta[name="twitter:description"]',
           new OGDescriptionRewriter(emoji_values)
         );
       const res = await context.next();
