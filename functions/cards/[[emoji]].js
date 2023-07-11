@@ -1648,7 +1648,7 @@ class OGImageRewriter {
   }
   element(element) {
     console.log("in element rewriter");
-    const new_image = `https://previews.emoji-tarot.com/${this.emoji_slugs.join(
+    const new_image = `https://preview.emoji-tarot.com/${this.emoji_slugs.join(
       "_"
     )}.png`;
     element.setAttribute("content", new_image);
