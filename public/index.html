@@ -353,7 +353,6 @@
           .then((emoji_list_data) => {
             const emoji_map = new Map(emoji_list_data);
             const emoji_list = emoji_list_data.map((sub_arr) => sub_arr[0]);
-            console.log(emoji_list);
             // keep an array for the emoji's that we'll pick randomly or get from the url
             const picks = [];
             // now that we have the emoji data we can check and see if the url contains a valid set of paths
@@ -373,6 +372,15 @@
 
               if (!unique_paths || !valid_paths) {
                 window.history.pushState(null, null, origin);
+                // bug here from not also doing the random numbers to pick
+                // for now we'll just duplicate the code from the other conditional path
+                const length = emoji_list.length;
+                const random_numbers = new Uint32Array(length);
+                window.crypto.getRandomValues(random_numbers);
+                const picked_numbers = random_numbers.slice(0, 3);
+                for (const num of picked_numbers) {
+                  picks.push(num % length);
+                }
               } else {
                 // we have a valid set of paths and should put them in the picks
                 for (const segment of segments) {
